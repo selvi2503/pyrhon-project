@@ -1,0 +1,163 @@
+import tkinter as tk
+from tkinter import messagebox
+import random
+
+# ---------------- MAIN WINDOW ----------------
+root = tk.Tk()
+root.title("Level 3 - Hacker Game")
+root.geometry("520x520")
+root.configure(bg="#0b3d2e")
+
+# ---------------- VARIABLES ----------------
+generated_password = ""
+generated_otp = ""
+password_verified = False
+otp_verified = False
+typing_text = "Accessing secure server..."
+typing_index = 0
+blink_state = True
+
+# ---------------- ANIMATION FUNCTIONS ----------------
+def hacker_typing():
+    global typing_index
+    if typing_index <= len(typing_text):
+        typing_label.config(text=typing_text[:typing_index])
+        typing_index += 1
+        root.after(120, hacker_typing)
+
+def blink_status():
+    global blink_state
+    if password_verified and otp_verified:
+        status_label.config(
+            fg="lime" if blink_state else "black"
+        )
+        blink_state = not blink_state
+        root.after(500, blink_status)
+
+# ---------------- FUNCTIONS ----------------
+def show_account_number():
+    messagebox.showinfo("Account Details", "Account Number:\n4589 7621 3344")
+
+def show_business_profile():
+    messagebox.showinfo(
+        "Business Profile",
+        "Account Type: Business\nStatus: Active\nBalance: ₹1,50,000"
+    )
+
+def generate_password():
+    global generated_password, password_verified
+    password_verified = False
+    generated_password = str(random.randint(1000, 9999))
+    messagebox.showinfo("Password Generated",
+                        f"Account Password: {generated_password}")
+
+def verify_password():
+    global password_verified
+    if password_entry.get() == generated_password and generated_password != "":
+        password_verified = True
+        messagebox.showinfo("Password Verified", "Password Correct")
+    else:
+        messagebox.showerror("Access Denied", "Wrong Password")
+
+def generate_otp():
+    global generated_otp, otp_verified
+    if not password_verified:
+        messagebox.showerror("Error", "Verify password first!")
+        return
+    otp_verified = False
+    generated_otp = str(random.randint(1000, 9999))
+    messagebox.showinfo("OTP Generated", f"OTP: {generated_otp}")
+
+def verify_otp():
+    global otp_verified
+    if otp_entry.get() == generated_otp and generated_otp != "":
+        otp_verified = True
+        messagebox.showinfo("OTP Verified", "OTP Correct")
+        blink_status()  # start blinking animation
+    else:
+        messagebox.showerror("Access Denied", "Invalid OTP")
+
+def withdraw_money():
+    if not password_verified or not otp_verified:
+        messagebox.showerror("Error", "Authentication incomplete!")
+        return
+
+    amount = amount_entry.get()
+    if amount.isdigit() and int(amount) > 0:
+        messagebox.showinfo(
+            "Transaction Successful",
+            f"₹{amount} Withdrawn Successfully!\n\n"
+            "TASK COMPLETED 🎯\n"
+            "You hacked the system!"
+        )
+        root.destroy()
+    else:
+        messagebox.showerror("Error", "Enter valid amount")
+
+# ---------------- UI ----------------
+tk.Label(root, text="LEVEL 3 - HACKER GAME",
+         bg="#0b3d2e", fg="lime",
+         font=("Arial", 16, "bold")).pack(pady=8)
+
+typing_label = tk.Label(root, text="",
+                        bg="#0b3d2e", fg="cyan",
+                        font=("Courier", 11))
+typing_label.pack()
+hacker_typing()   # start typing animation
+
+status_label = tk.Label(root, text="STATUS: SECURED",
+                        bg="#0b3d2e", fg="black",
+                        font=("Arial", 11, "bold"))
+status_label.pack(pady=5)
+
+# Info Buttons
+tk.Button(root, text="Account Number",
+          command=show_account_number,
+          width=25).pack(pady=3)
+
+tk.Button(root, text="Business Profile",
+          command=show_business_profile,
+          width=25).pack(pady=3)
+
+# Password Section
+tk.Button(root, text="Generate Password",
+          command=generate_password,
+          width=25).pack(pady=5)
+
+tk.Label(root, text="Enter Password",
+         bg="#0b3d2e", fg="white").pack()
+
+password_entry = tk.Entry(root, show="*")
+password_entry.pack()
+
+tk.Button(root, text="Verify Password",
+          command=verify_password).pack(pady=4)
+
+# OTP Section
+tk.Button(root, text="Generate OTP",
+          command=generate_otp,
+          width=25).pack(pady=5)
+
+tk.Label(root, text="Enter OTP",
+         bg="#0b3d2e", fg="white").pack()
+
+otp_entry = tk.Entry(root)
+otp_entry.pack()
+
+tk.Button(root, text="Verify OTP",
+          command=verify_otp).pack(pady=4)
+
+# Withdraw Section
+tk.Label(root, text="Withdraw Amount",
+         bg="#0b3d2e", fg="white").pack(pady=4)
+
+amount_entry = tk.Entry(root)
+amount_entry.pack()
+
+tk.Button(root, text="Withdraw",
+          command=withdraw_money,
+          bg="lime", fg="black",
+          font=("Arial", 10, "bold")).pack(pady=8)
+
+# ---------------- RUN ----------------
+root.mainloop()
